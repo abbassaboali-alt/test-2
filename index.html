@@ -741,6 +741,7 @@ hr{border:none;border-top:1px dashed #d6def0;margin:12px 0}
     <div class="modal-hint" id="studentDetailsHint">—</div>
     <div class="student-details-grid" id="studentDetailsGrid"></div>
     <div class="modal-actions">
+      <button class="btn green" id="saveStudentDetailsBtn" type="button" onclick="saveStudentDetails()">حفظ التعديلات</button>
       <button class="btn gray" type="button" onclick="closeStudentDetails()">إغلاق</button>
     </div>
   </div>
@@ -1061,6 +1062,7 @@ let COURSES  = [];
 let C_BY_ID  = {};
 let SELECTED = new Set();
 let EDIT_ID  = null;
+let DETAILS_ID = null;
 /* حفظ آخر عملية ترحيل */
 let LAST_LEVEL_ACTION = [];
 let LEVEL_UPDATED = new Set();
@@ -1593,34 +1595,95 @@ function openStudentDetails(id){
   const s = STUDENTS.find(x=>x.id===id);
   if(!s) return alert("تعذر العثور على بيانات الطالب");
 
+  DETAILS_ID = id;
   const birth = firstStudentValue(s,["Birthdate","birthdate","DateOfBirth","dateOfBirth"]);
-  const details = [
-    ["البريد الإلكتروني", firstStudentValue(s,["email","Email"])],
-    ["تاريخ الميلاد", detailDate(birth)],
-    ["العمر", firstStudentValue(s,["age","Age"])],
-    ["الجنسية", firstStudentValue(s,["Nationality","nationality"])],
-    ["المؤهل العلمي", firstStudentValue(s,["EducationLevel","educationLevel","Qualification","qualification"])],
-    ["الحالة الصحية", firstStudentValue(s,["HealthStatus","healthStatus","HealthCondition","healthCondition"])],
-    ["من أين تعرفت على معهد برودل؟", firstStudentValue(s,["HeardAbout","heardAbout","HowDidYouHear","howDidYouHear"])],
-    ["نوع الدورة", firstStudentValue(s,["CourseType","courseType","mode"])],
-    ["البرنامج", firstStudentValue(s,["Program","program"])],
-    ["رقم الهوية / الإقامة", firstStudentValue(s,["iqama","Iqama"])],
-    ["رقم الجوال", firstStudentValue(s,["phone","Phone"])],
-    ["تاريخ الموافقة على الشروط", detailDate(firstStudentValue(s,["TermsAcceptedAt","termsAcceptedAt"]))]
+  const rawBirth = birth?.toDate ? birth.toDate().toISOString().slice(0,10) : String(birth||"").slice(0,10);
+  const fields = [
+    ["detailEmail","البريد الإلكتروني","email",firstStudentValue(s,["email","Email"])],
+    ["detailBirthdate","تاريخ الميلاد","date",rawBirth],
+    ["detailAge","العمر","number",firstStudentValue(s,["age","Age"])],
+    ["detailNationality","الجنسية","text",firstStudentValue(s,["Nationality","nationality"])],
+    ["detailEducation","المؤهل العلمي","text",firstStudentValue(s,["EducationLevel","educationLevel","Qualification","qualification"])],
+    ["detailHealth","الحالة الصحية","text",firstStudentValue(s,["HealthStatus","healthStatus","HealthCondition","healthCondition"])],
+    ["detailHeardAbout","من أين تعرفت على معهد برودل؟","text",firstStudentValue(s,["HeardAbout","heardAbout","HowDidYouHear","howDidYouHear"])],
+    ["detailCourseType","نوع الدورة","text",firstStudentValue(s,["CourseType","courseType","mode"])],
+    ["detailProgram","البرنامج","text",firstStudentValue(s,["Program","program"])],
+    ["detailIqama","رقم الهوية / الإقامة","text",firstStudentValue(s,["iqama","Iqama"])],
+    ["detailPhone","رقم الجوال","text",firstStudentValue(s,["phone","Phone"])]
   ];
 
   studentDetailsHint.textContent = `${s.name_ar || s.name || "طالب"} — ${s.iqama || "بدون هوية"}`;
-  studentDetailsGrid.innerHTML = details.map(([label,value])=>`
+  studentDetailsGrid.innerHTML = fields.map(([fieldId,label,type,value])=>`
     <div class="student-detail-item">
-      <span class="detail-label">${safeDetail(label)}</span>
-      <span class="detail-value ${value ? "" : "details-empty"}">${value ? safeDetail(value) : "غير مسجل"}</span>
+      <label class="detail-label" for="${fieldId}">${safeDetail(label)}</label>
+      <input id="${fieldId}" type="${type}" value="${safeDetail(value)}" placeholder="غير مسجل">
     </div>
-  `).join("");
+  `).join("") + `
+    <div class="student-detail-item">
+      <span class="detail-label">تاريخ الموافقة على الشروط</span>
+      <span class="detail-value">${safeDetail(detailDate(firstStudentValue(s,["TermsAcceptedAt","termsAcceptedAt"]))) || "غير مسجل"}</span>
+    </div>`;
   studentDetailsModal.style.display = "flex";
 }
 
 function closeStudentDetails(){
   studentDetailsModal.style.display = "none";
+  DETAILS_ID = null;
+}
+
+async function saveStudentDetails(){
+  if(!DETAILS_ID) return alert("لم يتم تحديد طالب");
+
+  const emailValue = detailEmail.value.trim();
+  if(emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)){
+    detailEmail.focus();
+    return alert("البريد الإلكتروني غير صحيح");
+  }
+
+  const phoneValue = detailPhone.value.trim();
+  const ageValue = detailAge.value.trim();
+  if(ageValue && (+ageValue < 1 || +ageValue > 120)){
+    detailAge.focus();
+    return alert("العمر غير صحيح");
+  }
+
+  const updateData = {
+    email: emailValue,
+    Email: emailValue,
+    Birthdate: detailBirthdate.value,
+    birthdate: detailBirthdate.value,
+    age: ageValue === "" ? "" : +ageValue,
+    Nationality: detailNationality.value.trim(),
+    nationality: detailNationality.value.trim(),
+    EducationLevel: detailEducation.value.trim(),
+    educationLevel: detailEducation.value.trim(),
+    HealthStatus: detailHealth.value.trim(),
+    healthStatus: detailHealth.value.trim(),
+    HeardAbout: detailHeardAbout.value.trim(),
+    heardAbout: detailHeardAbout.value.trim(),
+    CourseType: detailCourseType.value.trim(),
+    courseType: detailCourseType.value.trim(),
+    Program: detailProgram.value.trim(),
+    program: detailProgram.value.trim(),
+    iqama: detailIqama.value.trim(),
+    phone: phoneValue,
+    updatedAt: firebase.firestore.Timestamp.now()
+  };
+
+  const saveBtn = document.getElementById("saveStudentDetailsBtn");
+  saveBtn.disabled = true;
+  saveBtn.textContent = "جارٍ الحفظ...";
+  try{
+    await db.collection("students").doc(DETAILS_ID).update(updateData);
+    alert("تم حفظ بيانات الطالب بنجاح");
+    closeStudentDetails();
+  }catch(err){
+    console.error(err);
+    alert("تعذر حفظ البيانات. راجع صلاحيات قاعدة البيانات.");
+  }finally{
+    saveBtn.disabled = false;
+    saveBtn.textContent = "حفظ التعديلات";
+  }
 }
 
 /* ===========================
