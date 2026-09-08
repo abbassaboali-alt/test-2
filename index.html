@@ -1,94 +1,603 @@
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prudle | طلبات التسجيل</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
-  <style>
-    :root{--blue:#164478;--navy:#102f55;--sky:#edf5ff;--line:#dbe6f3;--text:#21334a;--muted:#6e7e91;}
-    *{box-sizing:border-box} body{margin:0;background:#f4f7fb;color:var(--text);font-family:Tajawal,Arial,sans-serif}
-    .page{max-width:1400px;margin:auto;padding:28px 18px 45px}.hero{background:linear-gradient(120deg,var(--navy),var(--blue));border-radius:20px;padding:25px 28px;color:#fff;box-shadow:0 12px 30px #12355a33;display:flex;justify-content:space-between;gap:18px;align-items:center}.brand{font-size:13px;letter-spacing:.5px;opacity:.82}.hero h1{margin:5px 0 0;font-size:27px}.hero p{margin:7px 0 0;opacity:.85;font-size:14px}.counter{background:#ffffff1f;border:1px solid #ffffff45;border-radius:14px;padding:12px 17px;text-align:center;min-width:106px}.counter b{display:block;font-size:25px}.counter span{font-size:12px}
-    .filters{background:#fff;margin-top:18px;padding:16px;border:1px solid var(--line);border-radius:16px;display:grid;grid-template-columns:1.2fr repeat(4,1fr) auto;gap:10px;box-shadow:0 5px 15px #1b48700a}input,select,button{font:inherit;border-radius:10px;padding:11px 12px;border:1px solid #d4deea;background:#fff;color:var(--text)}input:focus,select:focus{outline:2px solid #b7d2f0;border-color:#75a9dd}button{cursor:pointer;background:var(--blue);color:#fff;border:0;font-weight:800;padding-inline:18px}button:hover{background:#0f3967}
-    .actions{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:14px;display:flex;align-items:center;flex-wrap:wrap;gap:9px}.actions .selected{font-size:12px;font-weight:800;color:var(--muted);margin-left:auto}.actions select{min-width:210px;padding:9px 11px}.actions button{padding:9px 13px;font-size:12px}.actions .soft{background:#eaf3fe;color:var(--blue)}.actions .danger{background:#c73737}.actions .orange{background:#b66a00}.actions .undo{background:#fff2d9;color:#925600;border:1px solid #f0cf91}.undo-list{display:flex;flex-wrap:wrap;gap:6px}.undo-item{display:flex;align-items:center;gap:6px;background:#fff8e9;border:1px solid #efd49d;border-radius:99px;padding:5px 9px;color:#80520a;font-size:11px;font-weight:800}.undo-item button{padding:3px 8px!important;background:#fff!important;border:1px solid #d7a847!important;color:#80520a!important;font-size:11px!important}.actions button:disabled{opacity:.48;cursor:not-allowed;transform:none;box-shadow:none}.check{width:17px;height:17px;accent-color:var(--blue);cursor:pointer}
-    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}.stat span{font-size:12px;color:var(--muted);font-weight:700}.stat b{display:block;font-size:23px;margin-top:4px;color:var(--blue)}
-    .panel{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.panel-head{padding:15px 18px;border-bottom:1px solid var(--line);font-weight:900;color:var(--blue);display:flex;justify-content:space-between}.table-scroll{overflow:auto}table{width:100%;border-collapse:collapse;min-width:1450px}th{background:#f7faff;color:#55708e;font-size:12px;text-align:right;padding:13px 14px;white-space:nowrap}td{padding:14px;border-top:1px solid #edf1f5;font-size:13px;vertical-align:middle}tr:hover td{background:#fbfdff}.name{font-weight:900;color:#173c69}.sub{font-size:11px;color:var(--muted);margin-top:3px}.pill{display:inline-block;padding:5px 10px;border-radius:99px;font-size:11px;font-weight:800;background:#e9f3ff;color:#1761a6}.pill.promotion{background:#f1eaff;color:#7045ac}.money{font-weight:800;white-space:nowrap}.muted{text-align:center;color:var(--muted);padding:45px!important}.error{color:#b32323}.details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.detail-card{background:#f4f8fc;border:1px solid #dce8f4;border-radius:11px;padding:11px}.detail-card label{display:block;color:#65778d;font-size:11px;font-weight:800;margin:0 0 5px}.detail-card input{width:100%;margin:0;padding:9px 10px;background:#fff}.details-btn{background:#eaf3fe;color:#164478}.details-modal-card{width:min(680px,100%);max-height:90vh;overflow:auto}@media(max-width:600px){.details-grid{grid-template-columns:1fr}}
-    .modal{display:none;position:fixed;inset:0;background:#0b254b88;z-index:9;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.modal-card{width:min(520px,100%);background:#fff;border-radius:18px;padding:22px;box-shadow:0 20px 50px #071b3788}.modal-card h3{margin:0;color:var(--blue)}.modal-card p{font-size:13px;color:var(--muted);margin:7px 0 16px}.modal-card label{font-size:12px;font-weight:800;color:#42617f;display:block;margin:13px 0 6px}.modal-card select{width:100%}.level-preview{background:#f4f8fc;border:1px solid #dce8f4;border-radius:10px;padding:12px;margin-top:14px;font-size:13px;line-height:1.9}.modal-buttons{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}.modal-buttons .cancel{background:#edf2f7;color:#455d77}
-    @media(max-width:850px){.page{padding:16px 12px}.hero{padding:20px;align-items:flex-start}.hero h1{font-size:22px}.filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}.filters button{grid-column:1/-1}.summary{grid-template-columns:1fr 1fr}.counter{min-width:80px}.actions .selected{width:100%;margin:0}}
-  </style>
+
+  <meta
+charset="UTF-8">
+
+  <meta
+name="viewport" content="width=device-width,
+initial-scale=1.0">
+
+  <title>Prudle | طلبات التسجيل</title>
+
+  <link
+href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap"
+rel="stylesheet">
+
+  <script
+src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+
+  <script
+src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+
+  <style>
+
+   
+:root{--blue:#164478;--navy:#102f55;--sky:#edf5ff;--line:#dbe6f3;--text:#21334a;--muted:#6e7e91;}
+
+    *{box-sizing:border-box}
+body{margin:0;background:#f4f7fb;color:var(--text);font-family:Tajawal,Arial,sans-serif}
+
+   
+.page{max-width:1400px;margin:auto;padding:28px 18px
+45px}.hero{background:linear-gradient(120deg,var(--navy),var(--blue));border-radius:20px;padding:25px
+28px;color:#fff;box-shadow:0 12px 30px #12355a33;display:flex;justify-content:space-between;gap:18px;align-items:center}.brand{font-size:13px;letter-spacing:.5px;opacity:.82}.hero
+h1{margin:5px 0 0;font-size:27px}.hero p{margin:7px 0
+0;opacity:.85;font-size:14px}.counter{background:#ffffff1f;border:1px solid
+#ffffff45;border-radius:14px;padding:12px
+17px;text-align:center;min-width:106px}.counter
+b{display:block;font-size:25px}.counter span{font-size:12px}
+
+   
+.filters{background:#fff;margin-top:18px;padding:16px;border:1px solid
+var(--line);border-radius:16px;display:grid;grid-template-columns:1.2fr
+repeat(4,1fr) auto;gap:10px;box-shadow:0 5px 15px
+#1b48700a}input,select,button{font:inherit;border-radius:10px;padding:11px
+12px;border:1px solid
+#d4deea;background:#fff;color:var(--text)}input:focus,select:focus{outline:2px
+solid
+#b7d2f0;border-color:#75a9dd}button{cursor:pointer;background:var(--blue);color:#fff;border:0;font-weight:800;padding-inline:18px}button:hover{background:#0f3967}
+
+   
+.actions{background:#fff;border:1px solid
+var(--line);border-radius:16px;padding:12px 14px;margin-top:14px;display:flex;align-items:center;flex-wrap:wrap;gap:9px}.actions
+.selected{font-size:12px;font-weight:800;color:var(--muted);margin-left:auto}.actions
+select{min-width:210px;padding:9px 11px}.actions button{padding:9px
+13px;font-size:12px}.actions
+.soft{background:#eaf3fe;color:var(--blue)}.actions
+.danger{background:#c73737}.actions .orange{background:#b66a00}.actions
+.undo{background:#fff2d9;color:#925600;border:1px solid
+#f0cf91}.undo-list{display:flex;flex-wrap:wrap;gap:6px}.undo-item{display:flex;align-items:center;gap:6px;background:#fff8e9;border:1px
+solid #efd49d;border-radius:99px;padding:5px
+9px;color:#80520a;font-size:11px;font-weight:800}.undo-item button{padding:3px
+8px!important;background:#fff!important;border:1px solid #d7a847!important;color:#80520a!important;font-size:11px!important}.actions
+button:disabled{opacity:.48;cursor:not-allowed;transform:none;box-shadow:none}.check{width:17px;height:17px;accent-color:var(--blue);cursor:pointer}
+
+   
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px
+0}.stat{background:#fff;border:1px solid
+var(--line);border-radius:14px;padding:14px 16px}.stat
+span{font-size:12px;color:var(--muted);font-weight:700}.stat
+b{display:block;font-size:23px;margin-top:4px;color:var(--blue)}
+
+   
+.panel{background:#fff;border:1px solid
+var(--line);border-radius:16px;overflow:hidden}.panel-head{padding:15px
+18px;border-bottom:1px solid
+var(--line);font-weight:900;color:var(--blue);display:flex;justify-content:space-between}.table-scroll{overflow:auto}table{width:100%;border-collapse:collapse;min-width:1450px}th{background:#f7faff;color:#55708e;font-size:12px;text-align:right;padding:13px
+14px;white-space:nowrap}td{padding:14px;border-top:1px solid
+#edf1f5;font-size:13px;vertical-align:middle}tr:hover
+td{background:#fbfdff}.name{font-weight:900;color:#173c69}.sub{font-size:11px;color:var(--muted);margin-top:3px}.pill{display:inline-block;padding:5px
+10px;border-radius:99px;font-size:11px;font-weight:800;background:#e9f3ff;color:#1761a6}.pill.promotion{background:#f1eaff;color:#7045ac}.money{font-weight:800;white-space:nowrap}.muted{text-align:center;color:var(--muted);padding:45px!important}.error{color:#b32323}.details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.detail-card{background:#f4f8fc;border:1px
+solid #dce8f4;border-radius:11px;padding:11px}.detail-card
+label{display:block;color:#65778d;font-size:11px;font-weight:800;margin:0 0
+5px}.detail-card input{width:100%;margin:0;padding:9px 10px;background:#fff}.details-btn{background:#eaf3fe;color:#164478}.details-modal-card{width:min(680px,100%);max-height:90vh;overflow:auto}.pill.pass{background:#e7f7ee;color:#14723d}.pill.fail{background:#ffeaea;color:#b42323}.pill.new{background:#e9f3ff;color:#1761a6}.end-sub-alert{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:8px;background:#fff0e6;color:#b54708;border:1px solid #ffc99f;font-size:10px;font-weight:900;white-space:nowrap}@media(max-width:600px){.details-grid{grid-template-columns:1fr}}
+
+   
+.modal{display:none;position:fixed;inset:0;background:#0b254b88;z-index:9;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.modal-card{width:min(520px,100%);background:#fff;border-radius:18px;padding:22px;box-shadow:0
+20px 50px #071b3788}.modal-card h3{margin:0;color:var(--blue)}.modal-card
+p{font-size:13px;color:var(--muted);margin:7px 0 16px}.modal-card
+label{font-size:12px;font-weight:800;color:#42617f;display:block;margin:13px 0
+6px}.modal-card select{width:100%}.level-preview{background:#f4f8fc;border:1px
+solid #dce8f4;border-radius:10px;padding:12px;margin-top:14px;font-size:13px;line-height:1.9}.modal-buttons{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}.modal-buttons
+.cancel{background:#edf2f7;color:#455d77}
+
+   
+@media(max-width:850px){.page{padding:16px 12px}.hero{padding:20px;align-items:flex-start}.hero
+h1{font-size:22px}.filters{grid-template-columns:1fr 1fr}.filters
+input{grid-column:1/-1}.filters
+button{grid-column:1/-1}.summary{grid-template-columns:1fr
+1fr}.counter{min-width:80px}.actions .selected{width:100%;margin:0}}
+
+  </style>
+
 </head>
+
 <body>
-  <main class="page">
-    <section class="hero"><div><div class="brand">PRUDLE INSTITUTE</div><h1>طلبات التسجيل والطلاب المسجلين مسبقًا</h1><p>عرض مباشر للبيانات المدخلة من نموذج الحجز</p></div><div class="counter"><b id="heroCount">0</b><span>سجل معروض</span></div></section>
-    <section class="filters"><input id="search" placeholder="ابحث بالاسم أو الهوية أو الجوال"><select id="branch"><option value="">كل الفروع</option></select><select id="section"><option value="">كل الأقسام</option></select><select id="program"><option value="">كل البرامج</option></select><select id="courseFilter"><option value="">كل الدورات / المستويات</option></select><select id="courseType"><option value="">كل أنواع الدورات</option></select><select id="period"><option value="">كل الفترات</option></select><select id="room"><option value="">كل القاعات</option></select><input id="addedDate" type="date" title="تاريخ الإضافة"><select id="type"><option value="">كل الطلبات</option><option value="registration">تسجيل جديد</option><option value="promotion">مسجل مسبقًا</option></select><button id="refresh">تحديث</button></section>
-    <section class="actions"><button id="addRecord" class="soft">إضافة سجل جديد</button><button id="selectAll" class="soft">تحديد النتائج</button><button id="fees" class="soft">تعديل الدفعات</button><button id="paymentStatement" class="soft">بيان الدفعات</button><button id="editProgramLevel" class="orange">تعديل البرنامج والمستوى</button><button id="levels" class="orange">تعديل المستويات</button><select id="targetCourse"><option value="">اختر الدورة للترحيل</option></select><button id="migrate">ترحيل المحدد</button><button id="delete" class="danger">حذف المحدد</button><button id="export" class="soft">تصدير Excel</button><div id="undoList" class="undo-list"></div><span class="selected" id="selected">لم يتم تحديد أي سجل</span></section>
-    <section class="summary"><div class="stat"><span>إجمالي الطلبات</span><b id="total">0</b></div><div class="stat"><span>تسجيل جديد</span><b id="newCount">0</b></div><div class="stat"><span>مسجل مسبقًا</span><b id="promotionCount">0</b></div><div class="stat"><span>إجمالي المتبقي</span><b id="remaining">0 ر.س</b></div></section>
-    <section class="panel"><div class="panel-head"><span>سجل الطلبات</span><span id="status" class="sub">جاري التحميل…</span></div><div class="table-scroll"><table><thead><tr><th><input class="check" id="allCheck" type="checkbox" title="تحديد النتائج المعروضة"></th><th>#</th><th>الطالب</th><th>الهوية / الجوال</th><th>تاريخ الميلاد</th><th>العمر</th><th>الفترة / القاعة</th><th>بيانات إضافية</th><th>الدورة السابقة</th><th>الدورة الهدف</th><th>المبلغ</th><th>الحالة</th><th>تاريخ الطلب</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
-    <div class="modal" id="programLevelModal"><div class="modal-card"><h3>تعديل البرنامج والمستوى</h3><p id="modalIntro">اختر البرنامج ثم المستوى الجديد.</p><label for="modalProgram">البرنامج</label><select id="modalProgram"><option value="">— اختر البرنامج —</option></select><label for="modalLevel">المستوى</label><select id="modalLevel" disabled><option value="">— اختر البرنامج أولاً —</option></select><div class="level-preview" id="levelPreview">سيظهر ملخص التعديل هنا قبل الحفظ.</div><div class="modal-buttons"><button id="closeModal" class="cancel">إلغاء</button><button id="saveProgramLevel">حفظ التعديل</button></div></div></div>
-    <div class="modal" id="detailsModal"><div class="modal-card details-modal-card"><h3 id="detailsHeading">بيانات الطالب</h3><p id="detailsTitle">—</p><div class="details-grid" id="detailsGrid"></div><div class="modal-buttons"><button id="saveDetails" type="button">حفظ</button><button id="closeDetails" class="cancel" type="button">إغلاق</button></div></div></div>
-  </main>
-  <script>
-    firebase.initializeApp({apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",authDomain:"prudle-system.firebaseapp.com",projectId:"prudle-system"});
-    const db=firebase.firestore(), $=id=>document.getElementById(id); let rows=[], selected=new Set(), courses=[], detailsKey="";const undoActions={};
-    const PROGRAM_LEVELS={"برنامج اللغة الإنجليزية العامة":Array.from({length:12},(_,i)=>`Level-${i+1}`),"برنامج المحادثة":Array.from({length:6},(_,i)=>`Level-${i+1}`),"البرنامج المكثف الصباح":["مبتدئ","متوسط","متقدم"],"باقة الإتقان الشامل":["Level-1","Level-2"]};
-    const val=(x,...keys)=>{for(const k of keys){if(x[k]!==undefined&&x[k]!==null&&x[k]!=="")return x[k]}return ""};
-    const text=v=>String(v||"").trim(); const num=v=>Number(v)||0;
-    function date(v){try{const d=v?.toDate?v.toDate():new Date(v);return isNaN(d)?"—":d.toLocaleDateString("ar-SA")}catch{return "—"}}
-    function escapeHtml(v){return text(v).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))||"—"}
-    async function load(){
-      $("status").textContent="جاري تحميل البيانات…"; $("tbody").innerHTML='<tr><td colspan="9" class="muted">جاري التحميل…</td></tr>';
-      try{const [reg,prom]=await Promise.all([db.collection("FakeRegistrations").get(),db.collection("FakePromotions").get()]); rows=[];
-        const add=(snap,kind)=>snap.forEach(d=>{const x=d.data()||{}, course=x.course||{}, from=x.fromCourse||{}; rows.push({id:d.id,source:kind==="registration"?"FakeRegistrations":"FakePromotions",kind,name:val(x,"name_ar","nameAr","name","name_en"),en:val(x,"name","name_en"),iqama:val(x,"iqama","Iqama"),phone:val(x,"phone","Phone"),birthdate:val(x,"Birthdate","birthdate","DateOfBirth"),age:val(x,"age","Age"),email:val(x,"email","Email"),nationality:val(x,"Nationality","nationality"),healthStatus:val(x,"HealthStatus","healthStatus"),educationLevel:val(x,"EducationLevel","educationLevel"),heardAbout:val(x,"HeardAbout","heardAbout","HowDidYouHear"),branch:val(x,"Branch","branch",course.branch),section:val(x,"Section","section",course.section),program:val(x,"Program","program",course.program),courseType:val(x,"CourseType","courseType","mode",course.courseType),course:val(x,"TrainingCourse","courseName",course.name),period:val(x,"Period","period",course.period),room:val(x,"Room","room",course.Room,course.room),previousCourse:val(x,"previousCourse",from.name),previousPeriod:val(x,"previousPeriod",from.period),fee:num(val(x,"CourseFee","courseFee")),paid:num(val(x,"PaidAmount","paidAmount")),remaining:num(val(x,"RemainingAmount","remainingAmount")),created:val(x,"createdAt","date","Date"),raw:x});}); add(reg,"registration");add(prom,"promotion"); rows.sort((a,b)=>{const da=a.created?.toDate?a.created.toDate():new Date(a.created||0),dbb=b.created?.toDate?b.created.toDate():new Date(b.created||0);return dbb-da}); await loadCourses(); fillSelects();render();}
-      catch(e){console.error(e);$("status").innerHTML='<span class="error">تعذر تحميل البيانات</span>';$("tbody").innerHTML='<tr><td colspan="9" class="muted error">حدث خطأ أثناء الاتصال بقاعدة البيانات.</td></tr>'}
+
+  <main
+class="page">
+
+    <section
+class="hero"><div><div class="brand">PRUDLE
+INSTITUTE</div><h1>طلبات التسجيل
+والطلاب المسجلين مسبقًا</h1><p>عرض مباشر للبيانات المدخلة من نموذج الحجز</p></div><div
+class="counter"><b id="heroCount">0</b><span>سجل معروض</span></div></section>
+
+    <section
+class="filters"><input id="search" placeholder="ابحث بالاسم أو الهوية أو الجوال"><select
+id="branch"><option value="">كل الفروع</option></select><select
+id="section"><option value="">كل الأقسام</option></select><select
+id="program"><option value="">كل البرامج</option></select><select
+id="courseFilter"><option value="">كل الدورات / المستويات</option></select><select
+id="courseType"><option value="">كل أنواع الدورات</option></select><select
+id="period"><option value="">كل الفترات</option></select><select
+id="room"><option value="">كل القاعات</option></select><input
+id="addedDate" type="date" title="تاريخ الإضافة"><select
+id="type"><option value="">كل الطلبات</option><option
+value="registration">تسجيل جديد</option><option
+value="promotion">مسجل مسبقًا</option></select><select
+id="resultStatus"><option value="">الحالة (الجديد افتراضيًا)</option><option
+value="new">جديد</option><option value="pass">ناجح</option><option
+value="fail">راسب</option></select><button
+id="refresh">تحديث</button></section>
+
+    <section
+class="actions"><button id="addRecord"
+class="soft">إضافة سجل جديد</button><button
+id="selectAll" class="soft">تحديد
+النتائج</button><button id="fees"
+class="soft">تعديل الدفعات</button><button
+id="paymentStatement" class="soft">بيان الدفعات</button><button
+id="editProgramLevel" class="orange">تعديل البرنامج والمستوى</button><button
+id="levels" class="orange">تعديل
+المستويات</button><select
+id="targetCourse"><option value="">اختر الدورة للترحيل</option></select><button
+id="migrate">ترحيل المحدد</button><button
+id="delete" class="danger">حذف
+المحدد</button><button id="export"
+class="soft">تصدير
+Excel</button><div id="undoList"
+class="undo-list"></div><span class="selected"
+id="selected">لم يتم تحديد أي سجل</span></section>
+
+    <section
+class="summary"><div class="stat"><span>إجمالي الطلبات</span><b
+id="total">0</b></div><div
+class="stat"><span>تسجيل
+جديد</span><b id="newCount">0</b></div><div
+class="stat"><span>مسجل
+مسبقًا</span><b
+id="promotionCount">0</b></div><div
+class="stat"><span>إجمالي
+المتبقي</span><b id="remaining">0 ر.س</b></div></section>
+
+    <section
+class="panel"><div class="panel-head"><span>سجل الطلبات</span><span
+id="status" class="sub">جاري
+التحميل…</span></div><div
+class="table-scroll"><table><thead><tr><th><input
+class="check" id="allCheck" type="checkbox"
+title="تحديد النتائج المعروضة"></th><th>#</th><th>الطالب</th><th>الهوية / الجوال</th><th>العمر</th><th>المستوى المسجل</th><th>الفترة / القاعة</th><th>بيانات إضافية</th><th>الدورة السابقة</th><th>الدورة الهدف</th><th>المبلغ</th><th>الدرجة</th><th>الحالة</th><th>تاريخ الطلب</th></tr></thead><tbody
+id="tbody"></tbody></table></div></section>
+
+    <div
+class="modal" id="programLevelModal"><div
+class="modal-card"><h3>تعديل
+البرنامج والمستوى</h3><p
+id="modalIntro">اختر البرنامج ثم المستوى الجديد.</p><label
+for="modalProgram">البرنامج</label><select
+id="modalProgram"><option value="">— اختر البرنامج
+—</option></select><label for="modalLevel">المستوى</label><select
+id="modalLevel" disabled><option value="">— اختر البرنامج أولاً
+—</option></select><div class="level-preview"
+id="levelPreview">سيظهر ملخص
+التعديل هنا قبل الحفظ.</div><div
+class="modal-buttons"><button id="closeModal"
+class="cancel">إلغاء</button><button
+id="saveProgramLevel">حفظ التعديل</button></div></div></div>
+
+    <div
+class="modal" id="detailsModal"><div
+class="modal-card details-modal-card"><h3
+id="detailsHeading">بيانات الطالب</h3><p
+id="detailsTitle">—</p><div
+class="details-grid"
+id="detailsGrid"></div><div
+class="modal-buttons"><button id="saveDetails"
+type="button">حفظ</button><button
+id="closeDetails" class="cancel"
+type="button">إغلاق</button></div></div></div>
+
+  </main>
+
+  <script>
+
+   
+firebase.initializeApp({apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",authDomain:"prudle-system.firebaseapp.com",projectId:"prudle-system"});
+
+    const db=firebase.firestore(),
+$=id=>document.getElementById(id); let rows=[], selected=new Set(),
+courses=[], detailsKey="";const undoActions={};
+
+    const PROGRAM_LEVELS={"برنامج اللغة الإنجليزية العامة":Array.from({length:12},(_,i)=>`Level-${i+1}`),"برنامج المحادثة":Array.from({length:6},(_,i)=>`Level-${i+1}`),"البرنامج المكثف الصباح":["مبتدئ","متوسط","متقدم"],"باقة الإتقان الشامل":["Level-1","Level-2"]};
+
+    const
+val=(x,...keys)=>{for(const k of
+keys){if(x[k]!==undefined&&x[k]!==null&&x[k]!=="")return
+x[k]}return ""};
+
+    const text=v=>String(v||"").trim();
+const num=v=>Number(v)||0;
+
+    function date(v){try{const
+d=v?.toDate?v.toDate():new Date(v);return
+isNaN(d)?"—":d.toLocaleDateString("ar-SA")}catch{return
+"—"}}
+
+    function escapeHtml(v){return
+text(v).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))||"—"}
+
+    const statusLabel=s=>s==="pass"?"ناجح":s==="fail"?"راسب":"جديد";
+    const statusClass=s=>s==="pass"?"pass":s==="fail"?"fail":"new";
+    const rawNumber=v=>{const n=Number(v);return v!==""&&v!==null&&v!==undefined&&!isNaN(n)?n:null};
+    function normalizeRow(d,source,defaultKind){
+      const x=d.data()||{},course=x.course||{},from=x.fromCourse||{};
+      const storedType=text(x.RegistrationType||x.registrationType).toLowerCase();
+      const kind=storedType==="promotion"?"promotion":storedType==="new"?"registration":defaultKind;
+      const grade=rawNumber(x.grade??x.finalGrade??x.final??x.totalGrade);
+      const status=grade===null?"new":(grade>=65?"pass":"fail");
+      const total=num(val(x,"TotalLevels","totalLevels")),used=num(val(x,"UsedLevels","usedLevels"));
+      return {id:d.id,source,kind,status,grade:grade===null?"—":grade,
+        name:val(x,"name_ar","nameAr","name","name_en"),en:val(x,"name","name_en"),
+        iqama:val(x,"iqama","Iqama"),phone:val(x,"phone","Phone"),birthdate:val(x,"Birthdate","birthdate","DateOfBirth"),age:val(x,"age","Age"),
+        email:val(x,"email","Email"),nationality:val(x,"Nationality","nationality"),healthStatus:val(x,"HealthStatus","healthStatus"),educationLevel:val(x,"EducationLevel","educationLevel"),heardAbout:val(x,"HeardAbout","heardAbout","HowDidYouHear"),
+        branch:val(x,"Branch","branch",course.Branch,course.branch),section:val(x,"Section","section",course.Section,course.section),program:val(x,"Program","program",course.Program,course.program),courseType:val(x,"CourseType","courseType","mode",course.CourseType,course.courseType),
+        course:val(x,"TrainingCourse","courseName",course.TrainingCourse,course.name),period:val(x,"Period","period",course.Period,course.period),room:val(x,"Room","room",course.Room,course.room),
+        previousCourse:text(x.previousCourse?.name||x.previousCourse||from.TrainingCourse||from.name||x.fromLevel||""),previousPeriod:val(x,"previousPeriod",from.Period,from.period),
+        totalLevels:total,usedLevels:used,remainingLevels:Math.max(total-used,0),
+        fee:num(val(x,"CourseFee","courseFee")),paid:num(val(x,"PaidAmount","paidAmount")),remaining:num(val(x,"RemainingAmount","remainingAmount")),created:val(x,"createdAt","date","Date"),raw:x};
     }
-    const clean=v=>text(v).replace(/\s+/g," ").trim();
-    const sectionParts=v=>[...new Set(clean(v).split(/[,،]/).map(clean).filter(Boolean))];
-    function fillSelects(){refreshFilterOptions()}
-    const openCourse=c=>text(val(c,"status","Status")).toLowerCase()==="open";
-    function refreshTargetCourses(){const keep=$("targetCourse").value,branch=$("branch").value,section=$("section").value;const list=courses.filter(c=>openCourse(c)&&(!branch||text(c.Branch||c.branch)===branch)&&(!section||text(c.Section||c.section)===section));$("targetCourse").innerHTML='<option value="">اختر الدورة للترحيل</option>';list.forEach(c=>{const level=c.TrainingCourse||c.CourseName||"دورة",period=c.Period||c.period||"—",br=c.Branch||c.branch||"",sec=c.Section||c.section||"",trainer=c.Trainer||c.trainer||"بدون مدرب";$("targetCourse").add(new Option(`${level} — ${br} — ${sec} — ${period} — المدرب: ${trainer}`,c.id))});if([...$("targetCourse").options].some(o=>o.value===keep))$("targetCourse").value=keep}
-    async function loadCourses(){try{const s=await db.collection("Courses").get();courses=s.docs.map(d=>({id:d.id,...d.data()})).filter(openCourse);refreshTargetCourses()}catch(e){console.warn("Could not load courses",e)}}
-    function dateKey(v){try{const d=v?.toDate?v.toDate():new Date(v);return isNaN(d)?"":d.toISOString().slice(0,10)}catch{return ""}}
-    function hasActiveFilter(){return !!(text($("search").value)||$("branch").value||$("section").value||$("program").value||$("courseFilter").value||$("courseType").value||$("period").value||$("room").value||$("addedDate").value||$("type").value)}
-    const matchesSection=(r,section)=>!section||(section==="Women,Kids"?sectionParts(r.section).includes("Women")&&sectionParts(r.section).includes("Kids"):sectionParts(r.section).includes(section));
-    const FILTER_STEPS=["branch","section","program","courseFilter","courseType","period","room","addedDate","type"];
-    function matchesPrevious(r,index){for(let i=0;i<index;i++){const id=FILTER_STEPS[i],v=$(id).value;if(!v)continue;if(id==="branch"&&clean(r.branch)!==v)return false;if(id==="section"&&!matchesSection(r,v))return false;if(id==="program"&&clean(r.program)!==v)return false;if(id==="courseFilter"&&clean(r.course)!==v)return false;if(id==="courseType"&&clean(r.courseType)!==v)return false;if(id==="period"&&clean(r.period)!==v)return false;if(id==="room"&&clean(r.room)!==v)return false;if(id==="addedDate"&&dateKey(r.created)!==v)return false}return true}
-    function refreshFilterOptions(){const labels={branch:"كل الفروع",section:"كل الأقسام",program:"كل البرامج",courseFilter:"كل الدورات / المستويات",courseType:"كل أنواع الدورات",period:"كل الفترات",room:"كل القاعات",type:"كل الطلبات"};const keys={branch:"branch",program:"program",courseFilter:"course",courseType:"courseType",period:"period",room:"room"};FILTER_STEPS.forEach((id,index)=>{if(id==="addedDate")return;const select=$(id),keep=select.value,candidates=rows.filter(r=>matchesPrevious(r,index));let values;if(id==="section"){values=[...new Set(candidates.flatMap(r=>sectionParts(r.section)))];if(!values.includes("Women,Kids"))values.push("Women,Kids");values.sort((a,b)=>["Kids","Men","Women","Women,Kids"].indexOf(a)-["Kids","Men","Women","Women,Kids"].indexOf(b))}else if(id==="type"){values=[...new Set(candidates.map(r=>r.kind))]}else{values=[...new Set(candidates.map(r=>clean(r[keys[id]])).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}select.innerHTML=`<option value="">${labels[id]}</option>`;values.forEach(v=>select.add(new Option(id==="type"?(v==="promotion"?"مسجل مسبقًا":"تسجيل جديد"):v,v)));if(values.includes(keep))select.value=keep})}
-    function filtered(){if(!hasActiveFilter())return [];const q=text($("search").value).toLowerCase();return rows.filter(r=>(!$("branch").value||clean(r.branch)===$("branch").value)&&matchesSection(r,$("section").value)&&(!$("program").value||clean(r.program)===$("program").value)&&(!$("courseFilter").value||clean(r.course)===$("courseFilter").value)&&(!$("courseType").value||clean(r.courseType)===$("courseType").value)&&(!$("period").value||clean(r.period)===$("period").value)&&(!$("room").value||clean(r.room)===$("room").value)&&(!$("addedDate").value||dateKey(r.created)===$("addedDate").value)&&(!$("type").value||r.kind===$("type").value)&&(!q||[r.name,r.en,r.iqama,r.phone].join(" ").toLowerCase().includes(q)))}
-    function refreshPeriodOptions(){const select=$("period"),keep=select.value,q=text($("search").value).toLowerCase();if(!hasActiveFilter()){select.innerHTML='<option value="">كل الفترات</option>';return}const available=[...new Set(rows.filter(r=>(!$("branch").value||clean(r.branch)===$("branch").value)&&matchesSection(r,$("section").value)&&(!$("program").value||clean(r.program)===$("program").value)&&(!$("courseFilter").value||clean(r.course)===$("courseFilter").value)&&(!$("courseType").value||clean(r.courseType)===$("courseType").value)&&(!$("addedDate").value||dateKey(r.created)===$("addedDate").value)&&(!$("type").value||r.kind===$("type").value)&&(!q||[r.name,r.en,r.iqama,r.phone].join(" ").toLowerCase().includes(q))).map(r=>clean(r.period)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));select.innerHTML='<option value="">كل الفترات</option>';available.forEach(v=>select.add(new Option(v,v)));if(available.includes(keep))select.value=keep}
-    function updateSelected(){const n=selected.size;$("selected").textContent=n?`تم تحديد ${n} سجل`:"لم يتم تحديد أي سجل";const list=filtered();$("allCheck").checked=!!list.length&&list.every(r=>selected.has(r.source+"/"+r.id))}
-    function render(){refreshFilterOptions();refreshTargetCourses();const list=filtered(), regs=list.filter(r=>r.kind==="registration"), promos=list.filter(r=>r.kind==="promotion"), rem=list.reduce((s,r)=>s+r.remaining,0);$("heroCount").textContent=list.length;$("total").textContent=list.length;$("newCount").textContent=regs.length;$("promotionCount").textContent=promos.length;$("remaining").textContent=rem.toLocaleString("en-US")+" ر.س";$("status").textContent=`${list.length} نتيجة`;
-      const targetOption=$("targetCourse").selectedOptions[0],targetLabel=$("targetCourse").value&&targetOption?text(targetOption.textContent):"—";
-      $("tbody").innerHTML=list.length?list.map((r,i)=>{const key=r.source+"/"+r.id;return `<tr><td><input class="check rowCheck" data-key="${key}" type="checkbox" ${selected.has(key)?"checked":""}></td><td>${i+1}</td><td><div class="name">${escapeHtml(r.name)}</div>${r.en&&r.en!==r.name?`<div class="sub">${escapeHtml(r.en)}</div>`:""}</td><td>${escapeHtml(r.iqama)}<div class="sub" dir="ltr">${escapeHtml(r.phone)}</div></td><td>${escapeHtml(r.birthdate)}</td><td>${escapeHtml(r.age)}</td><td>${escapeHtml(r.period)}<div class="sub">القاعة: ${escapeHtml(r.room)}</div></td><td><button type="button" class="details-btn rowDetails" data-key="${key}">عرض البيانات</button></td><td>${escapeHtml(r.previousCourse)}${r.previousPeriod?`<div class="sub">${escapeHtml(r.previousPeriod)}</div>`:""}</td><td title="${escapeHtml(targetLabel)}"><span class="pill">${escapeHtml(targetLabel)}</span></td><td class="money">${r.fee.toLocaleString()} ر.س<div class="sub">مدفوع ${r.paid.toLocaleString()} · متبقي ${r.remaining.toLocaleString()}</div></td><td><span class="pill ${r.kind}">${r.kind==="promotion"?"مسجل مسبقًا":"تسجيل جديد"}</span></td><td>${date(r.created)}</td></tr>`}).join(""):`<tr><td colspan="13" class="muted">${hasActiveFilter()?"لا توجد بيانات مطابقة للفلاتر.":"اختر فرعًا أو قسمًا أو برنامجًا أو اكتب في البحث لعرض البيانات."}</td></tr>`;document.querySelectorAll(".rowCheck").forEach(c=>c.onchange=()=>{c.checked?selected.add(c.dataset.key):selected.delete(c.dataset.key);updateSelected()});document.querySelectorAll(".rowDetails").forEach(b=>b.onclick=()=>openDetails(b.dataset.key));updateSelected()}
-    function escapeAttr(v){return String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))}
-    function detailInput(id,label,value,type="text"){return `<div class="detail-card"><label for="${id}">${escapeHtml(label)}</label><input id="${id}" type="${type}" value="${escapeAttr(value)}" placeholder="غير مسجل"></div>`}
-    function recordTypeField(value,disabled){return `<div class="detail-card"><label for="dRecordType">نوع السجل</label><select id="dRecordType" ${disabled?"disabled":""}><option value="registration" ${value==="registration"?"selected":""}>تسجيل جديد</option><option value="promotion" ${value==="promotion"?"selected":""}>مسجل مسبقًا</option></select></div>`}
-    function detailsFields(r){const raw=r?.raw||{},sourceCourse=raw.course||{},trainer=r?val(raw,"Trainer","trainer",sourceCourse.Trainer,sourceCourse.trainer):"",total=val(raw,"totalLevels","TotalLevels"),used=val(raw,"usedLevels","UsedLevels");return recordTypeField(r?.kind||"registration",!!r)+detailInput("dNameAr","الاسم بالعربي",r?.name||"")+detailInput("dNameEn","الاسم بالإنجليزية",r?.en||"")+detailInput("dIqama","رقم الهوية / الإقامة",r?.iqama||"")+detailInput("dPhone","رقم الجوال",r?.phone||"")+detailInput("dBirthdate","تاريخ الميلاد",r?.birthdate||"","date")+detailInput("dAge","العمر",r?.age||"","number")+detailInput("dEmail","البريد الإلكتروني",r?.email||"","email")+detailInput("dNationality","الجنسية",r?.nationality||"")+detailInput("dHealth","الحالة الصحية",r?.healthStatus||"")+detailInput("dEducation","المؤهل العلمي",r?.educationLevel||"")+detailInput("dHeard","مصدر المعرفة",r?.heardAbout||"")+detailInput("dBranch","الفرع",r?.branch||"")+detailInput("dSection","القسم",r?.section||"")+detailInput("dType","نوع الدورة",r?.courseType||"")+detailInput("dProgram","البرنامج",r?.program||"")+detailInput("dLevel","المستوى",r?.course||"")+detailInput("dPeriod","الفترة",r?.period||"")+detailInput("dTrainer","المدرب",trainer)+detailInput("dRoom","القاعة",r?.room||"")+detailInput("dTotalLevels","إجمالي عدد المستويات",total,"number")+detailInput("dUsedLevels","المستويات المستخدمة",used,"number")}
-    function openDetails(key){const r=rows.find(x=>x.source+"/"+x.id===key);if(!r)return;detailsKey=key;$("detailsHeading").textContent="تعديل بيانات الطالب";$("detailsTitle").textContent=`${r.name||"طالب"} — ${r.iqama||"بدون هوية"}`;$("detailsGrid").innerHTML=detailsFields(r);$("detailsModal").classList.add("show")}
-    function openNewRecord(){detailsKey="NEW";$("detailsHeading").textContent="إضافة سجل جديد";$("detailsTitle").textContent="أدخل بيانات الطالب ثم اضغط حفظ";$("detailsGrid").innerHTML=detailsFields(null);$("detailsModal").classList.add("show")}
-    $("addRecord").onclick=openNewRecord;
-    function closeDetailsModal(){$("detailsModal").classList.remove("show");detailsKey=""}
-    $("closeDetails").onclick=closeDetailsModal;$("detailsModal").onclick=e=>{if(e.target===$("detailsModal"))closeDetailsModal()};
-    $("saveDetails").onclick=async()=>{const isNew=detailsKey==="NEW",r=isNew?null:rows.find(x=>x.source+"/"+x.id===detailsKey);if(!isNew&&!r)return alert("تعذر العثور على السجل");const nameAr=$("dNameAr").value.trim(),nameEn=$("dNameEn").value.trim(),iqama=$("dIqama").value.trim(),phone=$("dPhone").value.trim(),email=$("dEmail").value.trim();if(!nameAr&&!nameEn)return alert("أدخل اسم الطالب");if(!iqama)return alert("أدخل رقم الهوية / الإقامة");if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return alert("البريد الإلكتروني غير صحيح");const age=$("dAge").value.trim();if(age&&(+age<1||+age>120))return alert("العمر غير صحيح");const total=Math.max(0,num($("dTotalLevels").value)),used=Math.max(0,num($("dUsedLevels").value)),remaining=Math.max(total-used,0),courseData={...(r?.raw?.course||{}),name:$("dLevel").value.trim(),period:$("dPeriod").value.trim(),program:$("dProgram").value.trim(),branch:$("dBranch").value.trim(),section:$("dSection").value.trim(),courseType:$("dType").value.trim(),trainer:$("dTrainer").value.trim(),room:$("dRoom").value.trim()};const now=firebase.firestore.Timestamp.now(),data={name_ar:nameAr,name:nameEn||nameAr,name_en:nameEn,iqama,phone,Birthdate:$("dBirthdate").value,birthdate:$("dBirthdate").value,age:age===""?"":+age,email,Email:email,Nationality:$("dNationality").value.trim(),nationality:$("dNationality").value.trim(),HealthStatus:$("dHealth").value.trim(),healthStatus:$("dHealth").value.trim(),EducationLevel:$("dEducation").value.trim(),educationLevel:$("dEducation").value.trim(),HeardAbout:$("dHeard").value.trim(),heardAbout:$("dHeard").value.trim(),Branch:$("dBranch").value.trim(),branch:$("dBranch").value.trim(),Section:$("dSection").value.trim(),section:$("dSection").value.trim(),CourseType:$("dType").value.trim(),courseType:$("dType").value.trim(),Program:$("dProgram").value.trim(),program:$("dProgram").value.trim(),TrainingCourse:$("dLevel").value.trim(),courseName:$("dLevel").value.trim(),Period:$("dPeriod").value.trim(),period:$("dPeriod").value.trim(),Trainer:$("dTrainer").value.trim(),trainer:$("dTrainer").value.trim(),Room:$("dRoom").value.trim(),room:$("dRoom").value.trim(),TotalLevels:total,totalLevels:total,UsedLevels:used,usedLevels:used,RemainingLevels:remaining,remainingLevels:remaining,course:courseData,updatedAt:now};if(isNew)data.createdAt=now;const collection=isNew?($("dRecordType").value==="promotion"?"FakePromotions":"FakeRegistrations"):r.source,btn=$("saveDetails");btn.disabled=true;btn.textContent="جاري الحفظ…";try{if(isNew)await db.collection(collection).add(data);else await db.collection(collection).doc(r.id).set(data,{merge:true});alert(isNew?"تمت إضافة السجل بنجاح":"تم حفظ بيانات الطالب بنجاح");closeDetailsModal();await load()}catch(e){console.error(e);alert("تعذر حفظ البيانات. راجع صلاحيات Firestore.")}finally{btn.disabled=false;btn.textContent="حفظ"}};
-    const selectedRows=()=>rows.filter(r=>selected.has(r.source+"/"+r.id)).map(r=>{r.raw.totalLevels=num(val(r.raw,"totalLevels","TotalLevels"));r.raw.usedLevels=num(val(r.raw,"usedLevels","UsedLevels"));r.raw.remainingLevels=Math.max(r.raw.totalLevels-r.raw.usedLevels,0);return r});
-    function renderUndoList(){const list=$("undoList"),actions=Object.entries(undoActions);list.innerHTML=actions.map(([key,a])=>`<span class="undo-item">${escapeHtml(a.label)} <button type="button" data-undo="${key}">تراجع</button></span>`).join("");list.querySelectorAll("[data-undo]").forEach(b=>b.onclick=()=>undoAction(b.dataset.undo))}
-    function rememberUndo(type,label,item){const key=`${type}_${item.source}_${item.id}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;undoActions[key]={type,label,item};renderUndoList()}
-    async function undoAction(key){const action=undoActions[key];if(!action)return;if(!confirm(`هل تريد التراجع عن ${action.label}؟`))return;try{const batch=db.batch(),item=action.item;if(action.type==="migration")batch.delete(db.collection("students").doc(item.studentId));batch.set(db.collection(item.source).doc(item.id),item.raw);await batch.commit();delete undoActions[key];renderUndoList();selected.clear();alert("تم التراجع بنجاح");load()}catch(e){console.error(e);alert("تعذر تنفيذ التراجع. راجع صلاحيات Firestore.")}}
-    $("selectAll").onclick=()=>{const list=filtered(),all=list.every(r=>selected.has(r.source+"/"+r.id));list.forEach(r=>all?selected.delete(r.source+"/"+r.id):selected.add(r.source+"/"+r.id));render()};$("allCheck").onchange=e=>$("selectAll").click();
-    $("fees").onclick=async()=>{const a=selectedRows();if(!a.length)return alert("حدد السجلات أولاً");const fee=prompt("إجمالي الرسوم للجميع (ر.س):");if(fee===null||isNaN(fee))return;const paid=prompt("المبلغ المدفوع للجميع (ر.س):");if(paid===null||isNaN(paid))return;const f=num(fee),p=num(paid);await Promise.all(a.map(r=>db.collection(r.source).doc(r.id).set({CourseFee:f,PaidAmount:p,RemainingAmount:Math.max(f-p,0)},{merge:true})));load()};
-    $("paymentStatement").onclick=()=>{const a=selectedRows();if(a.length!==1)return alert("لإصدار بيان دفعات، حدد طالبًا واحدًا فقط.");const r=a[0],now=new Date().toLocaleDateString("ar-SA"),safe=s=>escapeHtml(s);const w=window.open("","_blank","width=820,height=700");if(!w)return alert("اسمح للمتصفح بفتح النافذة لإصدار البيان.");w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>بيان دفعات - ${safe(r.name)}</title><style>body{font-family:Arial,Tahoma,sans-serif;color:#18334f;margin:35px}header{border-bottom:3px solid #164478;padding-bottom:18px;display:flex;justify-content:space-between;align-items:start}h1{margin:0;font-size:25px;color:#164478}.brand{font-size:13px;font-weight:bold;color:#164478}.date{color:#68788b;font-size:13px}.box{margin-top:25px;border:1px solid #d8e2ed;border-radius:10px;overflow:hidden}.row{display:grid;grid-template-columns:190px 1fr;border-bottom:1px solid #e6edf4}.row:last-child{border:0}.label{background:#f4f8fc;padding:13px;font-weight:bold}.value{padding:13px}.amounts{display:flex;gap:14px;margin-top:25px}.amount{flex:1;border-radius:10px;padding:16px;background:#f4f8fc}.amount b{display:block;font-size:23px;margin-top:8px;color:#164478}.remaining{background:#fff5e9}.remaining b{color:#a45b00}.footer{margin-top:42px;color:#718093;font-size:12px;border-top:1px solid #e4eaf0;padding-top:14px}@media print{body{margin:18px}.no-print{display:none}}</style></head><body><header><div><div class="brand">PRUDLE INSTITUTE · معهد برودل</div><h1>بيان الدفعات</h1></div><div class="date">تاريخ الإصدار: ${now}</div></header><div class="box"><div class="row"><div class="label">اسم الطالب</div><div class="value">${safe(r.name)}${r.en&&r.en!==r.name?`<br><small>${safe(r.en)}</small>`:""}</div></div><div class="row"><div class="label">رقم الهوية / الإقامة</div><div class="value">${safe(r.iqama)}</div></div><div class="row"><div class="label">الدورة</div><div class="value">${safe(r.course)}</div></div><div class="row"><div class="label">البرنامج والفترة</div><div class="value">${safe(r.program)} · ${safe(r.period)}</div></div><div class="row"><div class="label">الفرع والقسم</div><div class="value">${safe(r.branch)} · ${safe(r.section)}</div></div></div><div class="amounts"><div class="amount">إجمالي الرسوم<b>${r.fee.toLocaleString()} ر.س</b></div><div class="amount">المبلغ المدفوع<b>${r.paid.toLocaleString()} ر.س</b></div><div class="amount remaining">المبلغ المتبقي<b>${r.remaining.toLocaleString()} ر.س</b></div></div><div class="footer">هذا البيان صادر من نظام معهد برودل للغات.</div><button class="no-print" onclick="print()" style="margin-top:22px;background:#164478;color:white;border:0;padding:11px 22px;border-radius:7px;cursor:pointer">طباعة / حفظ PDF</button></body></html>`);w.document.close()};
-    Object.keys(PROGRAM_LEVELS).forEach(p=>$("modalProgram").add(new Option(p,p)));
-    function updateLevelOptions(){const program=$("modalProgram").value, levels=PROGRAM_LEVELS[program]||[];$("modalLevel").innerHTML=program?'<option value="">— اختر المستوى —</option>':'<option value="">— اختر البرنامج أولاً —</option>';levels.forEach(level=>$("modalLevel").add(new Option(level,level)));$("modalLevel").disabled=!program;updateLevelPreview()}
-    function updateLevelPreview(){const a=selectedRows(),program=$("modalProgram").value,level=$("modalLevel").value;if(!a.length){$("levelPreview").textContent="حدد السجلات أولاً.";return}$("levelPreview").innerHTML=`<b>ملخص التعديل</b><br>عدد الطلاب: ${a.length}<br>البرنامج: ${escapeHtml(program||"—")}<br>المستوى الجديد: ${escapeHtml(level||"—")}<br>الفرع: ${escapeHtml(a[0].branch||"—")} · القسم: ${escapeHtml(a[0].section||"—")}`}
-    $("editProgramLevel").onclick=()=>{const a=selectedRows();if(!a.length)return alert("حدد طالبًا واحدًا أو أكثر أولاً");$("modalIntro").textContent=`سيتم تعديل البرنامج والمستوى لـ ${a.length} طالب/طلاب محددين.`;$("modalProgram").value="";updateLevelOptions();$("programLevelModal").classList.add("show")};
-    $("modalProgram").onchange=updateLevelOptions;$("modalLevel").onchange=updateLevelPreview;$("closeModal").onclick=()=>$("programLevelModal").classList.remove("show");$("programLevelModal").onclick=e=>{if(e.target===$("programLevelModal"))$("programLevelModal").classList.remove("show")};
-    $("saveProgramLevel").onclick=async()=>{const a=selectedRows(),program=$("modalProgram").value,level=$("modalLevel").value;if(!program||!level)return alert("اختر البرنامج والمستوى أولاً");if(!confirm(`سيتم تعديل ${a.length} طالب إلى ${program} / ${level}. هل تريد المتابعة؟`))return;try{await Promise.all(a.map(r=>db.collection(r.source).doc(r.id).set({Program:program,TrainingCourse:level,course:{...(r.raw.course||{}),name:level,program:program,branch:r.branch,section:r.section}},{merge:true})));$("programLevelModal").classList.remove("show");alert("تم تعديل البرنامج والمستوى بنجاح");load()}catch(e){console.error(e);alert("تعذر حفظ التعديل. راجع صلاحيات Firestore.")}};
-    $("levels").onclick=async()=>{const a=selectedRows();if(!a.length)return alert("حدد السجلات أولاً");const total=prompt("إجمالي المستويات:");if(total===null||isNaN(total))return;const used=prompt("المستويات المستخدمة:","0");if(used===null||isNaN(used))return;const t=num(total),u=num(used),rem=Math.max(t-u,0);await Promise.all(a.map(r=>db.collection(r.source).doc(r.id).set({TotalLevels:t,totalLevels:t,UsedLevels:u,usedLevels:u,RemainingLevels:rem,remainingLevels:rem},{merge:true})));load()};
-    $("delete").onclick=async()=>{const a=selectedRows();if(!a.length)return alert("حدد السجلات أولاً");if(!confirm(`سيتم حذف ${a.length} سجل. ستتوفر خاصية التراجع بعد الحذف. هل تريد المتابعة؟`))return;try{for(let i=0;i<a.length;i+=400){const batch=db.batch();a.slice(i,i+400).forEach(r=>batch.delete(db.collection(r.source).doc(r.id)));await batch.commit()}a.forEach(r=>rememberUndo("delete",`حذف: ${r.name||r.iqama||"سجل"}`,{source:r.source,id:r.id,raw:r.raw}));selected.clear();alert("تم الحذف. استخدم زر «تراجع» بجانب كل سجل لإعادته.");load()}catch(e){console.error(e);alert("تعذر حذف السجلات. راجع صلاحيات Firestore.")}};
-    $("migrate").onclick=async()=>{const a=selectedRows(),id=$("targetCourse").value,course=courses.find(c=>c.id===id);if(!a.length)return alert("حدد السجلات المراد ترحيلها أولاً");if(!course)return alert("اختر الدورة الهدف");const targetLabel=text($("targetCourse").selectedOptions[0]?.textContent||"");if(!confirm(`سيتم ترحيل ${a.length} طالب إلى:\n${targetLabel}\n\nهل تريد المتابعة؟`))return;try{const undoItems=[];for(let i=0;i<a.length;i+=200){const batch=db.batch();a.slice(i,i+200).forEach(r=>{const ref=db.collection("students").doc(),oldCourse=r.raw.course||{},targetName=val(course,"TrainingCourse","CourseName","courseName","name")||"",targetPeriod=val(course,"Period","period")||"",targetTrainer=val(course,"Trainer","trainer")||"",targetRoom=val(course,"Room","room")||"",targetBranch=val(course,"Branch","branch")||r.branch,targetSection=val(course,"Section","section")||r.section,targetProgram=val(course,"Program","program")||r.program,targetType=val(course,"CourseType","courseType")||r.courseType||"حضوري";const studentData={...r.raw,name:r.en||r.raw.name||r.name,name_en:r.en||r.raw.name_en||r.raw.name||r.name,name_ar:r.raw.name_ar||r.name,iqama:r.iqama,phone:r.phone,Birthdate:r.birthdate,birthdate:r.birthdate,age:r.age,email:r.email,Nationality:r.nationality,nationality:r.nationality,HealthStatus:r.healthStatus,healthStatus:r.healthStatus,EducationLevel:r.educationLevel,educationLevel:r.educationLevel,HeardAbout:r.heardAbout,heardAbout:r.heardAbout,courseId:course.id,TrainingCourse:targetName,courseName:targetName,Period:targetPeriod,period:targetPeriod,Trainer:targetTrainer,Room:targetRoom,Branch:targetBranch,Section:targetSection,CourseType:targetType,Program:targetProgram,CourseFee:r.fee,PaidAmount:r.paid,RemainingAmount:r.remaining,course:{...oldCourse,id:course.id,courseId:course.id,name:targetName,TrainingCourse:targetName,period:targetPeriod,Period:targetPeriod,trainer:targetTrainer,Trainer:targetTrainer,room:targetRoom,Room:targetRoom,branch:targetBranch,Branch:targetBranch,section:targetSection,Section:targetSection,courseType:targetType,CourseType:targetType,program:targetProgram,Program:targetProgram},sourceRequest:{collection:r.source,id:r.id},migratedAt:firebase.firestore.Timestamp.now(),promotedAt:firebase.firestore.Timestamp.now()};batch.set(ref,studentData);batch.delete(db.collection(r.source).doc(r.id));undoItems.push({source:r.source,id:r.id,raw:r.raw,studentId:ref.id})});await batch.commit()}undoItems.forEach(item=>rememberUndo("migration",`ترحيل: ${item.raw.name_ar||item.raw.name||item.raw.iqama||"طالب"}`,item));selected.clear();alert(`تم الترحيل بنجاح إلى:\n${targetLabel}`);load()}catch(e){console.error(e);alert("تعذر إكمال الترحيل. لم يتم تنفيذ أي مجموعة غير مكتملة.")}};
-    $("export").onclick=()=>{const a=filtered();if(!a.length)return alert("لا توجد بيانات لتصديرها");const fields=[["الاسم","الاسم بالإنجليزية","الهوية","الجوال","تاريخ الميلاد","العمر","البريد الإلكتروني","الجنسية","الحالة الصحية","المؤهل العلمي","مصدر المعرفة","الفرع","القسم","نوع الدورة","البرنامج","المستوى","الفترة","الدورة السابقة","الرسوم","المدفوع","المتبقي","النوع","التاريخ"],...a.map(r=>[r.name,r.en,r.iqama,r.phone,r.birthdate,r.age,r.email,r.nationality,r.healthStatus,r.educationLevel,r.heardAbout,r.branch,r.section,r.courseType,r.program,r.course,r.period,r.previousCourse,r.fee,r.paid,r.remaining,r.kind==="promotion"?"مسجل مسبقًا":"تسجيل جديد",date(r.created)])];const csv='\uFEFF'+fields.map(x=>x.map(v=>'"'+String(v??"").replaceAll('"','""')+'"').join(',')).join('\n');const link=document.createElement("a");link.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));link.download="Prudle_Registrations.csv";link.click();URL.revokeObjectURL(link.href)};
-    ["search","branch","section","program","courseFilter","courseType","period","room","addedDate","type","targetCourse"].forEach(id=>$(id).addEventListener(id==="search"?"input":"change",render));$("refresh").onclick=load;load();
-  </script>
+
+    async function enrichLevelsFromStudents(){
+      const ids=[...new Set(rows.map(r=>text(r.iqama)).filter(Boolean))],cache={};let cursor=0;
+      const worker=async()=>{while(cursor<ids.length){const iq=ids[cursor++];try{const snap=await db.collection("students").where("iqama","==",iq).limit(20).get();if(snap.empty)continue;const docs=snap.docs.map(d=>d.data()||{});const stamp=x=>{const v=x.promotedAt||x.createdAt;return v?.toDate?v.toDate().getTime():(new Date(v||0).getTime()||0)};docs.sort((a,b)=>stamp(b)-stamp(a));cache[iq]=docs[0]}catch(e){console.warn("تعذر تحميل مستويات",iq,e)}}};
+      await Promise.all(Array.from({length:Math.min(10,ids.length||1)},worker));
+      rows.forEach(r=>{const s=cache[text(r.iqama)];if(!s)return;const hasTotal=r.raw.TotalLevels!==undefined||r.raw.totalLevels!==undefined,hasUsed=r.raw.UsedLevels!==undefined||r.raw.usedLevels!==undefined;if(!hasTotal)r.totalLevels=num(s.TotalLevels??s.totalLevels);if(!hasUsed)r.usedLevels=num(s.UsedLevels??s.usedLevels);r.remainingLevels=Math.max(r.totalLevels-r.usedLevels,0)});
+    }
+
+    async function load(){
+
+     
+$("status").textContent="جاري تحميل البيانات…"; $("tbody").innerHTML='<tr><td colspan="14" class="muted">جاري التحميل…</td></tr>';
+
+      try{const
+[reg,prom]=await
+Promise.all([db.collection("FakeRegistrations").get(),db.collection("FakePromotions").get()]);
+rows=[];
+
+        const add=(snap,kind)=>snap.forEach(d=>rows.push(normalizeRow(d,kind==="registration"?"FakeRegistrations":"FakePromotions",kind)));
+add(reg,"registration");add(prom,"promotion");
+rows.sort((a,b)=>{const da=a.created?.toDate?a.created.toDate():new
+Date(a.created||0),dbb=b.created?.toDate?b.created.toDate():new
+Date(b.created||0);return dbb-da}); await enrichLevelsFromStudents(); await loadCourses();
+fillSelects();render();}
+
+     
+catch(e){console.error(e);$("status").innerHTML='<span class="error">تعذر تحميل البيانات</span>';$("tbody").innerHTML='<tr><td colspan="14" class="muted error">حدث خطأ أثناء الاتصال بقاعدة البيانات.</td></tr>'}
+
+    }
+
+    const
+clean=v=>text(v).replace(/\s+/g," ").trim();
+
+    const
+sectionParts=v=>[...new Set(clean(v).split(/[,،]/).map(clean).filter(Boolean))];
+
+    function
+fillSelects(){refreshFilterOptions()}
+
+    const
+openCourse=c=>text(val(c,"status","Status")).toLowerCase()==="open";
+
+    function
+refreshTargetCourses(){const
+keep=$("targetCourse").value,branch=$("branch").value,section=$("section").value;const
+list=courses.filter(c=>openCourse(c)&&(!branch||text(c.Branch||c.branch)===branch)&&(!section||text(c.Section||c.section)===section));$("targetCourse").innerHTML='<option value="">اختر الدورة للترحيل</option>';list.forEach(c=>{const
+level=c.TrainingCourse||c.CourseName||"دورة",period=c.Period||c.period||"—",br=c.Branch||c.branch||"",sec=c.Section||c.section||"",trainer=c.Trainer||c.trainer||"بدون مدرب";$("targetCourse").add(new
+Option(`${level} — ${br} — ${sec} — ${period} — المدرب:
+${trainer}`,c.id))});if([...$("targetCourse").options].some(o=>o.value===keep))$("targetCourse").value=keep}
+
+    async function
+loadCourses(){try{const s=await
+db.collection("Courses").get();courses=s.docs.map(d=>({id:d.id,...d.data()})).filter(openCourse);refreshTargetCourses()}catch(e){console.warn("Could not load courses",e)}}
+
+    function dateKey(v){try{const
+d=v?.toDate?v.toDate():new Date(v);return
+isNaN(d)?"":d.toISOString().slice(0,10)}catch{return ""}}
+
+    function
+hasActiveFilter(){return !!(text($("search").value)||$("branch").value||$("section").value||$("program").value||$("courseFilter").value||$("courseType").value||$("period").value||$("room").value||$("addedDate").value||$("type").value||$("resultStatus").value)}
+
+    const
+matchesSection=(r,section)=>!section||sectionParts(r.section).includes(section);
+
+    const
+FILTER_STEPS=["branch","section","program","courseFilter","courseType","period","room","addedDate","type","resultStatus"];
+
+    function matchesPrevious(r,index){for(let
+i=0;i<index;i++){const
+id=FILTER_STEPS[i],v=$(id).value;if(!v)continue;if(id==="branch"&&clean(r.branch)!==v)return
+false;if(id==="section"&&!matchesSection(r,v))return
+false;if(id==="program"&&clean(r.program)!==v)return
+false;if(id==="courseFilter"&&clean(r.course)!==v)return
+false;if(id==="courseType"&&clean(r.courseType)!==v)return
+false;if(id==="period"&&clean(r.period)!==v)return
+false;if(id==="room"&&clean(r.room)!==v)return
+false;if(id==="addedDate"&&dateKey(r.created)!==v)return
+false;if(id==="type"&&r.kind!==v)return false;if(id==="resultStatus"&&r.status!==v)return
+false}return true}
+
+    function
+refreshFilterOptions(){const labels={branch:"كل الفروع",section:"كل الأقسام",program:"كل البرامج",courseFilter:"كل الدورات / المستويات",courseType:"كل أنواع الدورات",period:"كل الفترات",room:"كل القاعات",type:"كل الطلبات"};const
+keys={branch:"branch",program:"program",courseFilter:"course",courseType:"courseType",period:"period",room:"room"};FILTER_STEPS.forEach((id,index)=>{if(id==="addedDate")return;const
+select=$(id),keep=select.value,candidates=rows.filter(r=>matchesPrevious(r,index));let
+values;if(id==="section"){values=[...new
+Set(candidates.flatMap(r=>sectionParts(r.section)))].sort((a,b)=>a.localeCompare(b))}else
+if(id==="type"){values=[...new
+Set(candidates.map(r=>r.kind))]}else if(id==="resultStatus"){values=["new","pass","fail"]}else{values=[...new
+Set(candidates.map(r=>clean(r[keys[id]])).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}select.innerHTML=`<option
+value="">${id==="resultStatus"?"الحالة (الجديد افتراضيًا)":labels[id]}</option>`;values.forEach(v=>select.add(new
+Option(id==="type"?(v==="promotion"?"مسجل مسبقًا":"تسجيل جديد"):id==="resultStatus"?statusLabel(v):v,v)));if(values.includes(keep))select.value=keep})}
+
+    function
+filtered(){const q=text($("search").value).toLowerCase();return
+rows.filter(r=>(!$("branch").value||clean(r.branch)===$("branch").value)&&matchesSection(r,$("section").value)&&(!$("program").value||clean(r.program)===$("program").value)&&(!$("courseFilter").value||clean(r.course)===$("courseFilter").value)&&(!$("courseType").value||clean(r.courseType)===$("courseType").value)&&(!$("period").value||clean(r.period)===$("period").value)&&(!$("room").value||clean(r.room)===$("room").value)&&(!$("addedDate").value||dateKey(r.created)===$("addedDate").value)&&(!$("type").value||r.kind===$("type").value)&&(!q||[r.name,r.en,r.iqama,r.phone].join(" ").toLowerCase().includes(q))&&($("resultStatus").value?r.status===$("resultStatus").value:r.status==="new"))}
+
+    function
+refreshPeriodOptions(){const
+select=$("period"),keep=select.value,q=text($("search").value).toLowerCase();if(!hasActiveFilter()){select.innerHTML='<option value="">كل الفترات</option>';return}const
+available=[...new
+Set(rows.filter(r=>(!$("branch").value||clean(r.branch)===$("branch").value)&&matchesSection(r,$("section").value)&&(!$("program").value||clean(r.program)===$("program").value)&&(!$("courseFilter").value||clean(r.course)===$("courseFilter").value)&&(!$("courseType").value||clean(r.courseType)===$("courseType").value)&&(!$("addedDate").value||dateKey(r.created)===$("addedDate").value)&&(!$("type").value||r.kind===$("type").value)&&(!q||[r.name,r.en,r.iqama,r.phone].join(" ").toLowerCase().includes(q))).map(r=>clean(r.period)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));select.innerHTML='<option value="">كل الفترات</option>';available.forEach(v=>select.add(new
+Option(v,v)));if(available.includes(keep))select.value=keep}
+
+    function
+updateSelected(){const n=selected.size;$("selected").textContent=n?`تم تحديد ${n} سجل`:"لم يتم تحديد أي سجل";const
+list=filtered();$("allCheck").checked=!!list.length&&list.every(r=>selected.has(r.source+"/"+r.id))}
+
+    function
+render(){refreshFilterOptions();refreshTargetCourses();const list=filtered(),
+regs=list.filter(r=>r.kind==="registration"),
+promos=list.filter(r=>r.kind==="promotion"),
+rem=list.reduce((s,r)=>s+r.remaining,0);$("heroCount").textContent=list.length;$("total").textContent=list.length;$("newCount").textContent=regs.length;$("promotionCount").textContent=promos.length;$("remaining").textContent=rem.toLocaleString("en-US")+" ر.س";$("status").textContent=`${list.length}
+نتيجة`;
+
+      const
+targetOption=$("targetCourse").selectedOptions[0],targetLabel=$("targetCourse").value&&targetOption?text(targetOption.textContent):"—";
+
+     
+$("tbody").innerHTML=list.length?list.map((r,i)=>{const
+key=r.source+"/"+r.id;return `<tr><td><input
+class="check rowCheck" data-key="${key}"
+type="checkbox"
+${selected.has(key)?"checked":""}></td><td>${i+1}</td><td><div
+class="name">${escapeHtml(r.name)}</div>${r.en&&r.en!==r.name?`<div
+class="sub">${escapeHtml(r.en)}</div>`:""}</td><td>${escapeHtml(r.iqama)}<div
+class="sub"
+dir="ltr">${escapeHtml(r.phone)}</div></td><td>${escapeHtml(r.age)}</td><td><b>${escapeHtml(r.course)}</b>${r.totalLevels>0&&r.usedLevels>=r.totalLevels?`<div class="end-sub-alert">⚠️ انتهى الاشتراك</div>`:""}</td><td>${escapeHtml(r.period)}<div
+class="sub">القاعة: ${escapeHtml(r.room)}</div></td><td><button
+type="button" class="details-btn rowDetails"
+data-key="${key}">عرض البيانات</button></td><td>${r.status!=="new"?escapeHtml(r.previousCourse):"—"}${r.status!=="new"&&r.previousPeriod?`<div
+class="sub">${escapeHtml(r.previousPeriod)}</div>`:""}</td><td
+title="${escapeHtml(targetLabel)}"><span
+class="pill">${escapeHtml(targetLabel)}</span></td><td
+class="money">${r.fee.toLocaleString()} ر.س<div
+class="sub">مدفوع
+${r.paid.toLocaleString()} · متبقي
+${r.remaining.toLocaleString()}</div></td><td>${r.grade===0||r.grade!=="—"?escapeHtml(r.grade):"—"}</td><td><span
+class="pill ${statusClass(r.status)}">${statusLabel(r.status)}</span></td><td>${date(r.created)}</td></tr>`}).join(""):`<tr><td
+colspan="14" class="muted">لا توجد بيانات مطابقة للفلاتر.</td></tr>`;document.querySelectorAll(".rowCheck").forEach(c=>c.onchange=()=>{c.checked?selected.add(c.dataset.key):selected.delete(c.dataset.key);updateSelected()});document.querySelectorAll(".rowDetails").forEach(b=>b.onclick=()=>openDetails(b.dataset.key));updateSelected()}
+
+    function escapeAttr(v){return
+String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))}
+
+    function
+detailInput(id,label,value,type="text"){return `<div
+class="detail-card"><label
+for="${id}">${escapeHtml(label)}</label><input
+id="${id}" type="${type}"
+value="${escapeAttr(value)}" placeholder="غير مسجل"></div>`}
+
+    function
+recordTypeField(value,disabled){return `<div
+class="detail-card"><label for="dRecordType">نوع السجل</label><select
+id="dRecordType"
+${disabled?"disabled":""}><option
+value="registration"
+${value==="registration"?"selected":""}>تسجيل جديد</option><option
+value="promotion"
+${value==="promotion"?"selected":""}>مسجل مسبقًا</option></select></div>`}
+
+function detailsFields(r){const
+raw=r?.raw||{},sourceCourse=raw.course||{},trainer=r?val(raw,"Trainer","trainer",sourceCourse.Trainer,sourceCourse.trainer):"",total=val(raw,"totalLevels","TotalLevels")||r?.totalLevels||"",used=val(raw,"usedLevels","UsedLevels")||r?.usedLevels||"";return
+recordTypeField(r?.kind||"registration",!!r)+detailInput("dNameAr","الاسم بالعربي",r?.name||"")+detailInput("dNameEn","الاسم بالإنجليزية",r?.en||"")+detailInput("dIqama","رقم الهوية / الإقامة",r?.iqama||"")+detailInput("dPhone","رقم الجوال",r?.phone||"")+detailInput("dBirthdate","تاريخ الميلاد",r?.birthdate||"","date")+detailInput("dAge","العمر",r?.age||"","number")+detailInput("dEmail","البريد الإلكتروني",r?.email||"","email")+detailInput("dNationality","الجنسية",r?.nationality||"")+detailInput("dHealth","الحالة الصحية",r?.healthStatus||"")+detailInput("dEducation","المؤهل العلمي",r?.educationLevel||"")+detailInput("dHeard","مصدر المعرفة",r?.heardAbout||"")+detailInput("dBranch","الفرع",r?.branch||"")+detailInput("dSection","القسم",r?.section||"")+detailInput("dType","نوع الدورة",r?.courseType||"")+detailInput("dProgram","البرنامج",r?.program||"")+detailInput("dLevel","المستوى",r?.course||"")+detailInput("dPeriod","الفترة",r?.period||"")+detailInput("dTrainer","المدرب",trainer)+detailInput("dRoom","القاعة",r?.room||"")+detailInput("dTotalLevels","إجمالي عدد المستويات",total,"number")+detailInput("dUsedLevels","المستويات المستخدمة",used,"number")}
+
+    function
+openDetails(key){const
+r=rows.find(x=>x.source+"/"+x.id===key);if(!r)return;detailsKey=key;$("detailsHeading").textContent="تعديل بيانات الطالب";$("detailsTitle").textContent=`${r.name||"طالب"} —
+${r.iqama||"بدون هوية"}`;$("detailsGrid").innerHTML=detailsFields(r);$("detailsModal").classList.add("show")}
+
+    function
+openNewRecord(){detailsKey="NEW";$("detailsHeading").textContent="إضافة سجل جديد";$("detailsTitle").textContent="أدخل بيانات الطالب ثم اضغط حفظ";$("detailsGrid").innerHTML=detailsFields(null);$("detailsModal").classList.add("show")}
+
+   
+$("addRecord").onclick=openNewRecord;
+
+    function
+closeDetailsModal(){$("detailsModal").classList.remove("show");detailsKey=""}
+
+   
+$("closeDetails").onclick=closeDetailsModal;$("detailsModal").onclick=e=>{if(e.target===$("detailsModal"))closeDetailsModal()};
+
+   
+$("saveDetails").onclick=async()=>{const
+isNew=detailsKey==="NEW",r=isNew?null:rows.find(x=>x.source+"/"+x.id===detailsKey);if(!isNew&&!r)return
+alert("تعذر العثور على السجل");const
+nameAr=$("dNameAr").value.trim(),nameEn=$("dNameEn").value.trim(),iqama=$("dIqama").value.trim(),phone=$("dPhone").value.trim(),email=$("dEmail").value.trim();if(!nameAr&&!nameEn)return
+alert("أدخل اسم الطالب");if(!iqama)return
+alert("أدخل رقم الهوية / الإقامة");if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return
+alert("البريد الإلكتروني غير صحيح");const
+age=$("dAge").value.trim();if(age&&(+age<1||+age>120))return
+alert("العمر غير صحيح");const
+total=Math.max(0,num($("dTotalLevels").value)),used=Math.max(0,num($("dUsedLevels").value)),remaining=Math.max(total-used,0),courseData={...(r?.raw?.course||{}),name:$("dLevel").value.trim(),period:$("dPeriod").value.trim(),program:$("dProgram").value.trim(),branch:$("dBranch").value.trim(),section:$("dSection").value.trim(),courseType:$("dType").value.trim(),trainer:$("dTrainer").value.trim(),room:$("dRoom").value.trim()};const
+now=firebase.firestore.Timestamp.now(),data={name_ar:nameAr,name:nameEn||nameAr,name_en:nameEn,iqama,phone,Birthdate:$("dBirthdate").value,birthdate:$("dBirthdate").value,age:age===""?"":+age,email,Email:email,Nationality:$("dNationality").value.trim(),nationality:$("dNationality").value.trim(),HealthStatus:$("dHealth").value.trim(),healthStatus:$("dHealth").value.trim(),EducationLevel:$("dEducation").value.trim(),educationLevel:$("dEducation").value.trim(),HeardAbout:$("dHeard").value.trim(),heardAbout:$("dHeard").value.trim(),Branch:$("dBranch").value.trim(),branch:$("dBranch").value.trim(),Section:$("dSection").value.trim(),section:$("dSection").value.trim(),CourseType:$("dType").value.trim(),courseType:$("dType").value.trim(),Program:$("dProgram").value.trim(),program:$("dProgram").value.trim(),TrainingCourse:$("dLevel").value.trim(),courseName:$("dLevel").value.trim(),Period:$("dPeriod").value.trim(),period:$("dPeriod").value.trim(),Trainer:$("dTrainer").value.trim(),trainer:$("dTrainer").value.trim(),Room:$("dRoom").value.trim(),room:$("dRoom").value.trim(),TotalLevels:total,totalLevels:total,UsedLevels:used,usedLevels:used,RemainingLevels:remaining,remainingLevels:remaining,course:courseData,updatedAt:now};if(isNew)data.createdAt=now;const
+collection=isNew?($("dRecordType").value==="promotion"?"FakePromotions":"FakeRegistrations"):r.source,btn=$("saveDetails");btn.disabled=true;btn.textContent="جاري الحفظ…";try{if(isNew)await
+db.collection(collection).add(data);else await
+db.collection(collection).doc(r.id).set(data,{merge:true});alert(isNew?"تمت إضافة السجل بنجاح":"تم حفظ بيانات الطالب بنجاح");closeDetailsModal();await
+load()}catch(e){console.error(e);alert("تعذر حفظ البيانات. راجع صلاحيات Firestore.")}finally{btn.disabled=false;btn.textContent="حفظ"}};
+
+    const
+selectedRows=()=>rows.filter(r=>selected.has(r.source+"/"+r.id)).map(r=>{r.raw.totalLevels=num(val(r.raw,"totalLevels","TotalLevels"));r.raw.usedLevels=num(val(r.raw,"usedLevels","UsedLevels"));r.raw.remainingLevels=Math.max(r.raw.totalLevels-r.raw.usedLevels,0);return
+r});
+
+    function
+renderUndoList(){const
+list=$("undoList"),actions=Object.entries(undoActions);list.innerHTML=actions.map(([key,a])=>`<span
+class="undo-item">${escapeHtml(a.label)} <button
+type="button" data-undo="${key}">تراجع</button></span>`).join("");list.querySelectorAll("[data-undo]").forEach(b=>b.onclick=()=>undoAction(b.dataset.undo))}
+
+    function
+rememberUndo(type,label,item){const key=`${type}_${item.source}_${item.id}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;undoActions[key]={type,label,item};renderUndoList()}
+
+    async function
+undoAction(key){const action=undoActions[key];if(!action)return;if(!confirm(`هل تريد التراجع عن ${action.label}؟`))return;try{const
+batch=db.batch(),item=action.item;if(action.type==="migration")batch.delete(db.collection("students").doc(item.studentId));batch.set(db.collection(item.source).doc(item.id),item.raw);await
+batch.commit();delete undoActions[key];renderUndoList();selected.clear();alert("تم التراجع بنجاح");load()}catch(e){console.error(e);alert("تعذر تنفيذ التراجع. راجع صلاحيات Firestore.")}}
+
+   
+$("selectAll").onclick=()=>{const
+list=filtered(),all=list.every(r=>selected.has(r.source+"/"+r.id));list.forEach(r=>all?selected.delete(r.source+"/"+r.id):selected.add(r.source+"/"+r.id));render()};$("allCheck").onchange=e=>$("selectAll").click();
+
+   
+$("fees").onclick=async()=>{const
+a=selectedRows();if(!a.length)return alert("حدد السجلات أولاً");const fee=prompt("إجمالي الرسوم للجميع (ر.س):");if(fee===null||isNaN(fee))return;const
+paid=prompt("المبلغ المدفوع للجميع (ر.س):");if(paid===null||isNaN(paid))return;const
+f=num(fee),p=num(paid);await
+Promise.all(a.map(r=>db.collection(r.source).doc(r.id).set({CourseFee:f,PaidAmount:p,RemainingAmount:Math.max(f-p,0)},{merge:true})));load()};
+
+   
+$("paymentStatement").onclick=()=>{const
+a=selectedRows();if(a.length!==1)return alert("لإصدار بيان دفعات، حدد طالبًا واحدًا فقط.");const r=a[0],now=new
+Date().toLocaleDateString("ar-SA"),safe=s=>escapeHtml(s);const
+w=window.open("","_blank","width=820,height=700");if(!w)return
+alert("اسمح للمتصفح بفتح النافذة لإصدار البيان.");w.document.write(`<!DOCTYPE html><html
+lang="ar" dir="rtl"><head><meta
+charset="utf-8"><title>بيان
+دفعات - ${safe(r.name)}</title><style>body{font-family:Arial,Tahoma,sans-serif;color:#18334f;margin:35px}header{border-bottom:3px
+solid
+#164478;padding-bottom:18px;display:flex;justify-content:space-between;align-items:start}h1{margin:0;font-size:25px;color:#164478}.brand{font-size:13px;font-weight:bold;color:#164478}.date{color:#68788b;font-size:13px}.box{margin-top:25px;border:1px
+solid
+#d8e2ed;border-radius:10px;overflow:hidden}.row{display:grid;grid-template-columns:190px
+1fr;border-bottom:1px solid #e6edf4}.row:last-child{border:0}.label{background:#f4f8fc;padding:13px;font-weight:bold}.value{padding:13px}.amounts{display:flex;gap:14px;margin-top:25px}.amount{flex:1;border-radius:10px;padding:16px;background:#f4f8fc}.amount
+b{display:block;font-size:23px;margin-top:8px;color:#164478}.remaining{background:#fff5e9}.remaining
+b{color:#a45b00}.footer{margin-top:42px;color:#718093;font-size:12px;border-top:1px
+solid #e4eaf0;padding-top:14px}@media
+print{body{margin:18px}.no-print{display:none}}</style></head><body><header><div><div
+class="brand">PRUDLE INSTITUTE · معهد
+برودل</div><h1>بيان الدفعات</h1></div><div
+class="date">تاريخ الإصدار:
+${now}</div></header><div class="box"><div
+class="row"><div class="label">اسم الطالب</div><div
+class="value">${safe(r.name)}${r.en&&r.en!==r.name?`<br><small>${safe(r.en)}</small>`:""}</div></div><div
+class="row"><div class="label">رقم الهوية / الإقامة</div><div
+class="value">${safe(r.iqama)}</div></div><div
+class="row"><div class="label">الدورة</div><div
+class="value">${safe(r.course)}</div></div><div
+class="row"><div class="label">البرنامج والفترة</div><div
+class="value">${safe(r.program)} ·
+${safe(r.period)}</div></div><div
+class="row"><div class="label">الفرع والقسم</div><div
+class="value">${safe(r.branch)} ·
+${safe(r.section)}</div></div></div><div
+class="amounts"><div class="amount">إجمالي الرسوم<b>${r.fee.toLocaleString()}
+ر.س</b></div><div
+class="amount">المبلغ المدفوع<b>${r.paid.toLocaleString()}
+ر.س</b></div><div
+class="amount remaining">المبلغ
+المتبقي<b>${r.remaining.toLocaleString()} ر.س</b></div></div><div
+class="footer">هذا البيان صادر من نظام معهد برودل
+للغات.</div><button class="no-print"
+onclick="print()"
+style="margin-top:22px;background:#164478;color:white;border:0;padding:11px
+22px;border-radius:7px;cursor:pointer">طباعة
+/ حفظ PDF</button></body></html>`);w.document.close()};
+
+   
+Object.keys(PROGRAM_LEVELS).forEach(p=>$("modalProgram").add(new
+Option(p,p)));
+
+    function
+updateLevelOptions(){const program=$("modalProgram").value,
+levels=PROGRAM_LEVELS[program]||[];$("modalLevel").innerHTML=program?'<option value="">— اختر المستوى —</option>':'<option value="">— اختر البرنامج أولاً —</option>';levels.forEach(level=>$("modalLevel").add(new
+Option(level,level)));$("modalLevel").disabled=!program;updateLevelPreview()}
+
+    function updateLevelPreview(){const
+a=selectedRows(),program=$("modalProgram").value,level=$("modalLevel").value;if(!a.length){$("levelPreview").textContent="حدد السجلات أولاً.";return}$("levelPreview").innerHTML=`<b>ملخص التعديل</b><br>عدد الطلاب:
+${a.length}<br>البرنامج:
+${escapeHtml(program||"—")}<br>المستوى
+الجديد: ${escapeHtml(level||"—")}<br>الفرع: ${escapeHtml(a[0].branch||"—")}
+· القسم:
+${escapeHtml(a[0].section||"—")}`}
+
+   
+$("editProgramLevel").onclick=()=>{const
+a=selectedRows();if(!a.length)return alert("حدد طالبًا واحدًا أو أكثر أولاً");$("modalIntro").textContent=`سيتم تعديل البرنامج والمستوى لـ
+${a.length} طالب/طلاب محددين.`;$("modalProgram").value="";updateLevelOptions();$("programLevelModal").classList.add("show")};
+
+   
+$("modalProgram").onchange=updateLevelOptions;$("modalLevel").onchange=updateLevelPreview;$("closeModal").onclick=()=>$("programLevelModal").classList.remove("show");$("programLevelModal").onclick=e=>{if(e.target===$("programLevelModal"))$("programLevelModal").classList.remove("show")};
+
+   
+$("saveProgramLevel").onclick=async()=>{const
+a=selectedRows(),program=$("modalProgram").value,level=$("modalLevel").value;if(!program||!level)return
+alert("اختر البرنامج والمستوى أولاً");if(!confirm(`سيتم تعديل ${a.length} طالب إلى ${program} /
+${level}. هل تريد المتابعة؟`))return;try{await
+Promise.all(a.map(r=>db.collection(r.source).doc(r.id).set({Program:program,TrainingCourse:level,course:{...(r.raw.course||{}),name:level,program:program,branch:r.branch,section:r.section}},{merge:true})));$("programLevelModal").classList.remove("show");alert("تم تعديل البرنامج والمستوى بنجاح");load()}catch(e){console.error(e);alert("تعذر حفظ التعديل. راجع صلاحيات Firestore.")}};
+
+   
+$("levels").onclick=async()=>{const a=selectedRows();if(!a.length)return
+alert("حدد السجلات أولاً");const
+total=prompt("إجمالي المستويات:");if(total===null||isNaN(total))return;const
+used=prompt("المستويات المستخدمة:","0");if(used===null||isNaN(used))return;const
+t=num(total),u=num(used),rem=Math.max(t-u,0);await
+Promise.all(a.map(r=>db.collection(r.source).doc(r.id).set({TotalLevels:t,totalLevels:t,UsedLevels:u,usedLevels:u,RemainingLevels:rem,remainingLevels:rem},{merge:true})));load()};
+
+   
+$("delete").onclick=async()=>{const
+a=selectedRows();if(!a.length)return alert("حدد السجلات أولاً");if(!confirm(`سيتم حذف
+${a.length} سجل. ستتوفر خاصية التراجع بعد الحذف.
+هل تريد المتابعة؟`))return;try{for(let
+i=0;i<a.length;i+=400){const
+batch=db.batch();a.slice(i,i+400).forEach(r=>batch.delete(db.collection(r.source).doc(r.id)));await
+batch.commit()}a.forEach(r=>rememberUndo("delete",`حذف: ${r.name||r.iqama||"سجل"}`,{source:r.source,id:r.id,raw:r.raw}));selected.clear();alert("تم الحذف. استخدم زر «تراجع» بجانب كل سجل لإعادته.");load()}catch(e){console.error(e);alert("تعذر حذف السجلات. راجع صلاحيات Firestore.")}};
+
+   
+$("migrate").onclick=async()=>{const
+a=selectedRows(),id=$("targetCourse").value,course=courses.find(c=>c.id===id);if(!a.length)return
+alert("حدد السجلات المراد ترحيلها أولاً");if(!course)return
+alert("اختر الدورة الهدف");const
+targetLabel=text($("targetCourse").selectedOptions[0]?.textContent||"");if(!confirm(`سيتم ترحيل ${a.length} طالب إلى:\n${targetLabel}\n\nهل تريد المتابعة؟`))return;try{const
+undoItems=[];for(let i=0;i<a.length;i+=200){const batch=db.batch();a.slice(i,i+200).forEach(r=>{const
+ref=db.collection("students").doc(),oldCourse=r.raw.course||{},targetName=val(course,"TrainingCourse","CourseName","courseName","name")||"",targetPeriod=val(course,"Period","period")||"",targetTrainer=val(course,"Trainer","trainer")||"",targetRoom=val(course,"Room","room")||"",targetBranch=val(course,"Branch","branch")||r.branch,targetSection=val(course,"Section","section")||r.section,targetProgram=val(course,"Program","program")||r.program,targetType=val(course,"CourseType","courseType")||r.courseType||"حضوري";const
+studentData={...r.raw,name:r.en||r.raw.name||r.name,name_en:r.en||r.raw.name_en||r.raw.name||r.name,name_ar:r.raw.name_ar||r.name,iqama:r.iqama,phone:r.phone,Birthdate:r.birthdate,birthdate:r.birthdate,age:r.age,email:r.email,Nationality:r.nationality,nationality:r.nationality,HealthStatus:r.healthStatus,healthStatus:r.healthStatus,EducationLevel:r.educationLevel,educationLevel:r.educationLevel,HeardAbout:r.heardAbout,heardAbout:r.heardAbout,courseId:course.id,TrainingCourse:targetName,courseName:targetName,Period:targetPeriod,period:targetPeriod,Trainer:targetTrainer,Room:targetRoom,Branch:targetBranch,Section:targetSection,CourseType:targetType,Program:targetProgram,CourseFee:r.fee,PaidAmount:r.paid,RemainingAmount:r.remaining,course:{...oldCourse,id:course.id,courseId:course.id,name:targetName,TrainingCourse:targetName,period:targetPeriod,Period:targetPeriod,trainer:targetTrainer,Trainer:targetTrainer,room:targetRoom,Room:targetRoom,branch:targetBranch,Branch:targetBranch,section:targetSection,Section:targetSection,courseType:targetType,CourseType:targetType,program:targetProgram,Program:targetProgram},sourceRequest:{collection:r.source,id:r.id},migratedAt:firebase.firestore.Timestamp.now(),promotedAt:firebase.firestore.Timestamp.now()};batch.set(ref,studentData);batch.delete(db.collection(r.source).doc(r.id));undoItems.push({source:r.source,id:r.id,raw:r.raw,studentId:ref.id})});await
+batch.commit()}undoItems.forEach(item=>rememberUndo("migration",`ترحيل:
+${item.raw.name_ar||item.raw.name||item.raw.iqama||"طالب"}`,item));selected.clear();alert(`تم الترحيل بنجاح إلى:\n${targetLabel}`);load()}catch(e){console.error(e);alert("تعذر إكمال الترحيل. لم يتم تنفيذ أي مجموعة غير مكتملة.")}};
+
+   
+$("export").onclick=()=>{const
+a=filtered();if(!a.length)return alert("لا توجد بيانات لتصديرها");const fields=[["الاسم","الاسم بالإنجليزية","الهوية","الجوال","تاريخ الميلاد","العمر","البريد الإلكتروني","الجنسية","الحالة الصحية","المؤهل العلمي","مصدر المعرفة","الفرع","القسم","نوع الدورة","البرنامج","المستوى","الفترة","الدورة السابقة","الرسوم","المدفوع","المتبقي","النوع","التاريخ"],...a.map(r=>[r.name,r.en,r.iqama,r.phone,r.birthdate,r.age,r.email,r.nationality,r.healthStatus,r.educationLevel,r.heardAbout,r.branch,r.section,r.courseType,r.program,r.course,r.period,r.previousCourse,r.fee,r.paid,r.remaining,r.kind==="promotion"?"مسجل مسبقًا":"تسجيل جديد",date(r.created)])];const
+csv='\uFEFF'+fields.map(x=>x.map(v=>'"'+String(v??"").replaceAll('"','""')+'"').join(',')).join('\n');const
+link=document.createElement("a");link.href=URL.createObjectURL(new
+Blob([csv],{type:"text/csv;charset=utf-8"}));link.download="Prudle_Registrations.csv";link.click();URL.revokeObjectURL(link.href)};
+
+   
+["search","branch","section","program","courseFilter","courseType","period","room","addedDate","type","resultStatus","targetCourse"].forEach(id=>$(id).addEventListener(id==="search"?"input":"change",render));$("refresh").onclick=load;load();
+
+  </script>
+
 </body>
+
 </html>
